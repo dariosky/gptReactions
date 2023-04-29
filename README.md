@@ -12,6 +12,10 @@ valuable feedback. That is surely a task that AI can solve 🤣
 This bot that listen to all messages - ask OpenAI GPT for an appropriate
 Emoji that summarise their text and use that for a reaction. Lovely ❤️
 
+This is an example of the useless interaction that you can simulate
+
+![](examples/examples.png)
+
 ## Installation in a nutshell
 
 Nobody should use it - so, very quickly, this is how to install it:
@@ -31,6 +35,3 @@ Nobody should use it - so, very quickly, this is how to install it:
   ```
 * Install the requirements
 * Run the `bot.py`
-
-This is an example of the useless interaction that you can simulate
-![](examples/examples.png)

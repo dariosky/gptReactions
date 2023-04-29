@@ -20,15 +20,17 @@ Nobody should use it - so, very quickly, this is how to install it:
 * Give it (channels:history, chat:write, im:history, reactions:write)
 * Enable "Socket Mode"
 * Note down the Slack app token, bot token and signing secret together
-  with your OPENAI API key in a .env file
-* Let the bot running
+  with your OPENAI API key in a .env file.
+  Here is an example of how what `.env` file should look like
 
-Here is an example of how what `.env` file should look like
+  ```
+  SLACK_APP_TOKEN = xapp-...
+  SLACK_BOT_TOKEN = xoxb-...
+  SLACK_APP_SIGNING_SECRET = ...
+  OPENAI_API_KEY = ...
+  ```
+* Install the requirements
+* Run the `bot.py`
 
-```
-SLACK_APP_TOKEN = xapp-...
-SLACK_BOT_TOKEN = xoxb-...
-SLACK_APP_SIGNING_SECRET = ...
-OPENAI_API_KEY = ...
-```
-  
+This is an example of the useless interaction that you can simulate
+![](examples/examples.png)

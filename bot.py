@@ -25,10 +25,8 @@ openai.api_key = config["OPENAI_API_KEY"]
 
 @cachier(cache_dir=".cache")
 def get_openai_emoji(text):
-    print(f"Asking OPENAPI for an emoji for {text}.", end="")
-    prompt = textwrap.dedent(
-        f"""Get only one single representative emoji of the following text:\n\n{text}"""
-    )
+    print(f"Asking OPENAPI emojis for {text}.", end="")
+    prompt = textwrap.dedent(f"""Representative emojis of the following:\n\n{text}""")
     messages = [
         {"role": "user", "content": prompt},
     ]
@@ -58,24 +56,24 @@ def listen_and_react(body, say, client: WebClient):
     message_ts = body["event"]["ts"]
 
     response = get_openai_emoji(text)
-    unicode_emoji = response.choices[0]["message"]["content"]
-    if emoji.is_emoji(unicode_emoji):
-        if unicode_emoji in UNICODE_TO_EMOJI:
-            slack_emoji_name = UNICODE_TO_EMOJI[unicode_emoji]
-            print(unicode_emoji, slack_emoji_name)
-            try:
+    unicode_emojis = response.choices[0]["message"]["content"]
+    for unicode_emoji in unicode_emojis:
+        unicode_emoji = unicode_emoji.strip()
+        if emoji.is_emoji(unicode_emoji):
+            if unicode_emoji in UNICODE_TO_EMOJI:
+                slack_emoji_name = UNICODE_TO_EMOJI[unicode_emoji]
+                print(unicode_emoji, slack_emoji_name)
+                try:
 
-                client.reactions_add(
-                    channel=channel_id,
-                    timestamp=message_ts,
-                    name=slack_emoji_name,
-                )
-                return
-            except Exception as e:
-                print(f"Error sending reaction {e} - sending as text")
-        else:
-            print(f"Unknown slack-emoji-name for {unicode_emoji} - sending as text")
-        say(unicode_emoji)
+                    client.reactions_add(
+                        channel=channel_id,
+                        timestamp=message_ts,
+                        name=slack_emoji_name,
+                    )
+                except Exception as e:
+                    print(f"Error sending reaction {e}")
+            else:
+                print(f"Unknown slack-emoji-name for {unicode_emoji}")
 
 
 if __name__ == "__main__":

@@ -26,9 +26,8 @@ openai.api_key = config["OPENAI_API_KEY"]
 def get_openai_emoji(text):
     print(f"Asking OPENAPI emojis for {text}.", end="")
     prompt = textwrap.dedent(
-        f"""Representative emojis of the following sentence, 
-        but if there are multiple choices ignore the emojis 
-        related to the question or "versus":\n\n{text}"""
+        f"""Representative emojis of the following sentence,
+         but if there are multiple choices give one emoji for each:\n\n{text}"""
     )
     messages = [
         {"role": "user", "content": prompt},

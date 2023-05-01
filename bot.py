@@ -15,7 +15,6 @@ from dotenv import dotenv_values
 
 config = dotenv_values(".env")
 
-
 app = App(
     token=config["SLACK_BOT_TOKEN"],
     signing_secret=config["SLACK_APP_SIGNING_SECRET"],
@@ -26,7 +25,11 @@ openai.api_key = config["OPENAI_API_KEY"]
 @cachier(cache_dir=".cache")
 def get_openai_emoji(text):
     print(f"Asking OPENAPI emojis for {text}.", end="")
-    prompt = textwrap.dedent(f"""Representative emojis of the following:\n\n{text}""")
+    prompt = textwrap.dedent(
+        f"""Representative emojis of the following sentence, 
+        but if there are multiple choices ignore the emojis 
+        related to the question or "versus":\n\n{text}"""
+    )
     messages = [
         {"role": "user", "content": prompt},
     ]

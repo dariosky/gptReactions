@@ -1,3 +1,4 @@
+import json
 import textwrap
 
 import emoji
@@ -26,8 +27,16 @@ openai.api_key = config["OPENAI_API_KEY"]
 def get_openai_emoji(text):
     print(f"Asking OPENAPI emojis for {text}.", end="")
     prompt = textwrap.dedent(
-        f"""Representative emojis of the following sentence,
-         but if there are multiple choices give one emoji for each:\n\n{text}"""
+        f"""
+1. Check if the following text delimited by triple backticks contains a question with multiple choices
+2. Return a json formatted in this way:
+ If it does return a json object like:
+    multiple:true, emojis: <a dictionary with every choice and a relevant emoji>
+ If it doesn't: return json object like
+    multiple:false, emojis: <one single emoji relevant to the text>
+
+```{text}```
+"""
     )
     messages = [
         {"role": "user", "content": prompt},
@@ -43,7 +52,8 @@ def get_openai_emoji(text):
     )
     usage = response["usage"]
     print(f"Used {usage}")
-    return response
+    answer = json.loads(response.choices[0]["message"]["content"])
+    return answer
 
 
 @app.message()
@@ -58,7 +68,11 @@ def listen_and_react(body, say, client: WebClient):
     message_ts = body["event"]["ts"]
 
     response = get_openai_emoji(text)
-    unicode_emojis = response.choices[0]["message"]["content"]
+    multiple = response["multiple"]
+    if multiple:
+        unicode_emojis = response["emojis"].values()
+    else:
+        unicode_emojis = response["emojis"]
     for unicode_emoji in unicode_emojis:
         unicode_emoji = unicode_emoji.strip()
         if emoji.is_emoji(unicode_emoji):
@@ -76,6 +90,12 @@ def listen_and_react(body, say, client: WebClient):
                     print(f"Error sending reaction {e}")
             else:
                 print(f"Unknown slack-emoji-name for {unicode_emoji}")
+
+
+def examples():
+    print(get_openai_emoji("Dogs or cats?"))
+    print(get_openai_emoji("Dogs or cats or wild boars?"))
+    print(get_openai_emoji("I didn't see the schedule"))
 
 
 if __name__ == "__main__":

@@ -1,5 +1,8 @@
+import html
 import json
 import textwrap
+from json import JSONDecodeError
+from typing import Iterable
 
 import emoji
 import openai
@@ -8,7 +11,7 @@ from slack_bolt import App
 from slack_bolt.adapter.socket_mode import SocketModeHandler
 from slack_sdk import WebClient
 
-from emoji_map import UNICODE_TO_EMOJI
+from emoji_map import UNICODE_TO_EMOJI, EMOJI_MAP
 
 DEFAULT_MODEL = "gpt-3.5-turbo"
 
@@ -52,8 +55,44 @@ def get_openai_emoji(text):
     )
     usage = response["usage"]
     print(f"Used {usage}")
-    answer = json.loads(response.choices[0]["message"]["content"])
+    choice = response.choices[0]["message"]["content"]
+    try:
+        answer = json.loads(choice)
+    except JSONDecodeError:
+        print(f"Error decoding JSON: {choice}")
+        answer = {"error": True, "multiple": False, "emojis": ""}
+
     return answer
+
+
+def get_reactions(emojis):
+    if isinstance(emojis, dict):
+        unicode_emojis: Iterable = emojis.values()
+    else:
+        unicode_emojis: str = emojis
+        if (
+            formatted_slack_emoji := unicode_emojis.strip(":")
+        ) in EMOJI_MAP:  # it's already a slack emoji
+            unicode_emoji = html.unescape(EMOJI_MAP[formatted_slack_emoji])
+            unicode_emojis = unicode_emoji
+
+    for unicode_emoji in unicode_emojis:
+        unicode_emoji = unicode_emoji.strip()
+        if emoji.is_emoji(unicode_emoji):
+            if unicode_emoji in UNICODE_TO_EMOJI:
+                slack_emoji_name = UNICODE_TO_EMOJI[unicode_emoji]
+                print(unicode_emoji, slack_emoji_name)
+                yield slack_emoji_name
+            else:
+                print(f"Unknown slack-emoji-name for {unicode_emoji}")
+        else:
+            print(f"Not an emoji {unicode_emoji}")
+
+
+def text_to_reactions(text):
+    print(f"Looking for reactions `{text}`")
+    response = get_openai_emoji(text)
+    return [slack_emoji_name for slack_emoji_name in get_reactions(response["emojis"])]
 
 
 @app.message()
@@ -63,39 +102,24 @@ def listen_and_react(body, say, client: WebClient):
         return
 
     text = body["event"]["text"].lower()
-    print(f"Looking for an emoji to {text}")
     channel_id = body["event"]["channel"]
     message_ts = body["event"]["ts"]
 
-    response = get_openai_emoji(text)
-    multiple = response["multiple"]
-    if multiple:
-        unicode_emojis = response["emojis"].values()
-    else:
-        unicode_emojis = response["emojis"]
-    for unicode_emoji in unicode_emojis:
-        unicode_emoji = unicode_emoji.strip()
-        if emoji.is_emoji(unicode_emoji):
-            if unicode_emoji in UNICODE_TO_EMOJI:
-                slack_emoji_name = UNICODE_TO_EMOJI[unicode_emoji]
-                print(unicode_emoji, slack_emoji_name)
-                try:
-
-                    client.reactions_add(
-                        channel=channel_id,
-                        timestamp=message_ts,
-                        name=slack_emoji_name,
-                    )
-                except Exception as e:
-                    print(f"Error sending reaction {e}")
-            else:
-                print(f"Unknown slack-emoji-name for {unicode_emoji}")
+    for slack_emoji_name in text_to_reactions(text):
+        try:
+            client.reactions_add(
+                channel=channel_id,
+                timestamp=message_ts,
+                name=slack_emoji_name,
+            )
+        except Exception as e:
+            print(f"Error sending reaction {e}")
 
 
 def examples():
-    print(get_openai_emoji("Dogs or cats?"))
-    print(get_openai_emoji("Dogs or cats or wild boars?"))
-    print(get_openai_emoji("I didn't see the schedule"))
+    print(text_to_reactions("Dogs or cats?"))
+    print(text_to_reactions("Dogs or cats or wild boars?"))
+    print(text_to_reactions("I didn't see the schedule"))
 
 
 if __name__ == "__main__":

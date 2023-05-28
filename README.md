@@ -14,13 +14,13 @@ Emoji that summarise their text and use that for a reaction. Lovely ❤️
 
 This is an example of the useless interaction that you can simulate
 
-![](examples/examples.png)
+![](examples/message_reactions.png)
 
 ## Installation in a nutshell
 
 Nobody should use it - so, very quickly, this is how to install it:
 
-* Create a SlackBot
+* Create a SlackBot (there's a `app_manifest.yaml` you can start from)
 * Give it (channels:history, chat:write, im:history, reactions:write)
 * In Event subscriptions, allow: (`message.channels`, `message.im`,
   `message.group`)
@@ -36,4 +36,22 @@ Nobody should use it - so, very quickly, this is how to install it:
   OPENAI_API_KEY = ...
   ```
 * Install the requirements
-* Run the `bot.py`
+* Run the `bot.py` ⚡️
+
+## One more thing
+
+### Meteo
+
+Everything counts as a GPT-based reaction to a message,
+so this is also a playground for some other feature.
+The bot allows you to use a `/meteo` Slack command to get weather forecasts.
+
+Try for example
+```
+/meteo Marbella tomorrow afternoon
+```
+
+![](examples/meteo.png)
+
+GPT doesn't know about weather (or "tomorrow") but it knows places
+and time - so here we integrate with OpenMeteo to fill the gaps.

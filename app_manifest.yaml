@@ -1,0 +1,36 @@
+display_information:
+  name: gptReactions
+features:
+  bot_user:
+    display_name: gptReactions
+    always_online: false
+  slash_commands:
+    - command: /meteo
+      description: Get meteo forecasts wherever/whenever
+      usage_hint: Meteo  forecast question
+      should_escape: false
+oauth_config:
+  scopes:
+    bot:
+      - channels:history
+      - channels:read
+      - chat:write
+      - emoji:read
+      - groups:read
+      - im:history
+      - reactions:write
+      - groups:write
+      - groups:history
+      - users:write
+      - commands
+settings:
+  event_subscriptions:
+    bot_events:
+      - message.channels
+      - message.groups
+      - message.im
+  interactivity:
+    is_enabled: true
+  org_deploy_enabled: false
+  socket_mode_enabled: true
+  token_rotation_enabled: false

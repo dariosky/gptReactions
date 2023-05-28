@@ -190,7 +190,7 @@ def text_to_weather_request(text):
         Now is {now_formatted}
         Given the following text with a request for weather information - return me a json with:
         startTime: initial timestamp of the date the user is interested into or null if not specified
-        startTime: end timestamp of the date the user is interested into or null if not specified
+        endTime: end timestamp of the date the user is interested into or null if not specified
         location: the geographic latitude and longitude of the place the user is interested into
         
         Format the timestamps as ISO 8601 format

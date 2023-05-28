@@ -6,11 +6,12 @@ from pprint import pprint
 import requests
 from cachier import cachier
 
-from config import load_envs
 from llm import cache_folder, issue_command
 from .weather_codes import WMO_CODES, WEATHER_CODES
 
 logger = logging.getLogger(__name__)
+
+ISO_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
 
 
 @cachier(cache_dir=cache_folder)
@@ -146,16 +147,16 @@ def simplify_data_open_meteo(weather_timeline):
     """From the openmeteo hourly timeline to a shorter notation"""
     intervals = []
     r = {}
-    dateformat = "%Y-%m-%dT%H:%M:%SZ"
+
     for w in weather_timeline:
         last_weather_code = r.get("weatherCode")
         if last_weather_code is not None and w["weatherCode"] != last_weather_code:
             intervals.append(r)
             r = {}
-        dt = datetime.datetime.strptime(w["ts"], dateformat)
+        dt = datetime.datetime.strptime(w["ts"], ISO_FORMAT)
         if r.get("startTime") is None:
-            r["startTime"] = dt.strftime(dateformat)
-        r["endTime"] = (dt + datetime.timedelta(hours=1)).strftime(dateformat)
+            r["startTime"] = dt.strftime(ISO_FORMAT)
+        r["endTime"] = (dt + datetime.timedelta(hours=1)).strftime(ISO_FORMAT)
         r["weatherCode"] = w["weatherCode"]
         r["precipitation"] = max(r.get("precipitation", 0), w["precipitation"])
 
@@ -197,7 +198,13 @@ def text_to_weather_request(text):
         
         {text}
     """
-    return issue_command(prompt, temperature=0, return_json=True)
+    response = issue_command(prompt, temperature=0, return_json=True)
+    if not response.get("endTime"):
+        start_time = datetime.datetime.strptime(response["startTime"], ISO_FORMAT)
+        response["endTime"] = (start_time + datetime.timedelta(hours=24)).strftime(
+            ISO_FORMAT
+        )
+    return response
 
 
 def text_to_weather(text):
@@ -227,9 +234,3 @@ def example():
     )
 
     pprint(simplify_data_open_meteo(weather_timeline))
-
-
-if __name__ == "__main__":
-    load_envs()
-    logging.basicConfig()
-    print(text_to_weather("Weather next week in Marbella"))

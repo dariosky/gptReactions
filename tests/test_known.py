@@ -13,7 +13,7 @@ class TestPolls:
                 "tengo una pregunta sobre una botella de agua para hacer deporte",
                 {"sweat_drops"},
             ),
-            ("good morning how is it going today?", {"sun_with_face"}),
+            ("good morning how is it going today?", {"wave"}),
             ("ai learns to walk (deep reinforcement learning)", {"robot_face"}),
         ],
     )

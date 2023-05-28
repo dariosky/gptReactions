@@ -1,6 +1,11 @@
-import os.path
 import pathlib
 
-from dotenv import dotenv_values
+from dotenv import dotenv_values, load_dotenv
 
-config = dotenv_values(pathlib.Path(__file__).parent / ".env")
+dotenv_path = pathlib.Path(__file__).parent / ".env"
+
+config = dotenv_values(dotenv_path)
+
+
+def load_envs():
+    load_dotenv(dotenv_path)

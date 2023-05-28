@@ -1,4 +1,5 @@
 import json
+import logging
 import pathlib
 import textwrap
 from json import JSONDecodeError
@@ -12,21 +13,28 @@ DEFAULT_MODEL = "gpt-3.5-turbo"
 
 openai.api_key = config["OPENAI_API_KEY"]
 cache_folder = pathlib.Path(__file__).parent / ".cache"
+logger = logging.getLogger(__name__)
+
+
+def get_openai_emoji(text):
+    prompt = textwrap.dedent(
+        f"""
+            Consider the following text
+            ```{text}```
+
+        If the text is a question with multiple options return a JSON string
+            {{"multiple":true, "emojis": {{choice:"emoji"}} }}
+        Otherwise return a JSON string with
+            {{"multiple":false, "emojis": "single relevant emoji"}}
+        """
+    )
+    return issue_command(prompt, temperature=0, return_json=True)
 
 
 @cachier(cache_dir=cache_folder)
-def get_openai_emoji(text):
-    print(f"Asking OPENAPI emojis for {text}.")
-    prompt = textwrap.dedent(
-        f"""
-Determine if text within triple backticks has a multi-option question.
-Return JSON:
-If yes: {{"multiple":true, "emojis": {{choice:"emoji"}}}}
-If no: {{"multiple":false, "emojis": "single relevant emoji"}}
-
-```{text}```
-"""
-    )
+def issue_command(text, temperature=0.3, return_json=False):
+    prompt = textwrap.dedent(text).strip()
+    print(f"Asking OPENAPI {prompt}")
     messages = [
         {"role": "user", "content": prompt},
     ]
@@ -34,20 +42,19 @@ If no: {{"multiple":false, "emojis": "single relevant emoji"}}
     response = openai.ChatCompletion.create(
         model=DEFAULT_MODEL,
         messages=messages,
-        temperature=0,
+        temperature=temperature,
         top_p=1,
-        max_tokens=200,
         frequency_penalty=0,
         presence_penalty=0,
     )
     usage = response["usage"]
-    print(f"Used {usage}")
+    logger.debug(f"OpenAPI {DEFAULT_MODEL} used: {usage}")
     choice = response.choices[0]["message"]["content"]
-    try:
-        answer = json.loads(choice)
-    except JSONDecodeError:
-        print(f"Error decoding JSON: {choice}")
-        answer = {"error": True, "multiple": False, "emojis": ""}
-        # raise
-
-    return answer
+    if return_json:
+        try:
+            response = json.loads(choice)
+        except JSONDecodeError:
+            print(f"Error decoding JSON: {choice}")
+            raise
+        return response
+    return choice

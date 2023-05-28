@@ -1,0 +1,28 @@
+[tool.poetry]
+name = "gptReactions"
+version = "0.1.0"
+description = ""
+authors = ["Dario Varotto <dariosky@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.8"
+slack-sdk = "^3.21.3"
+slack-bolt = "^1.18.0"
+openai = "^0.27.7"
+python-dotenv = "^1.0.0"
+cachier = "^2.1.1"
+requests = "^2.30.0"
+openapi = "^1.1.0"
+
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.3.1"
+pre-commit = "^3.3.2"
+ruff = "^0.0.269"
+black = "^23.3.0"
+bandit = "^1.7.5"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

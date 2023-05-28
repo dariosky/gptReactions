@@ -1,6 +1,6 @@
 import pytest
 
-from slack_utils import text_to_reactions
+from reactions.slack_utils import text_to_reactions
 
 
 class TestPolls:

@@ -89,7 +89,6 @@ def get_weather_information_open_meteo(start_time, end_time, latitude, longitude
         )
     data = response.json()
     timeline = data["hourly"]
-    precipitation_units = data["hourly_units"]["precipitation"]
     response = [
         {
             "ts": ts + ":00Z",
@@ -176,8 +175,9 @@ def simplify_data_open_meteo(weather_timeline):
 
 def summarize_weather(summarized_weather_timeline):
     prompt = f"""
-        Summarize the following weather conditions with maximum 50 words and using emojis like ☀️☔️🥵:
-        
+        Summarize the following weather conditions
+        with maximum 50 words and using emojis like ☀️☔️🥵:
+
         {summarized_weather_timeline}
     """
     return issue_command(prompt)
@@ -189,13 +189,17 @@ def text_to_weather_request(text):
     now_formatted = now.strftime("%d %B, %Y - %H:%M UTC")
     prompt = f"""
         Now is {now_formatted}
-        Given the following text with a request for weather information - return me a json with:
-        startTime: initial timestamp of the date the user is interested into or null if not specified
-        endTime: end timestamp of the date the user is interested into or null if not specified
-        location: the geographic latitude and longitude of the place the user is interested into
-        
+        Given the following text with a request for weather information
+        - return me a json with:
+        startTime: initial timestamp of the date the user is interested into
+                   or null if not specified
+        endTime: end timestamp of the date the user is interested into
+                 or null if not specified
+        location: the geographic latitude and longitude of the place
+                  the user is interested into
+
         Format the timestamps as ISO 8601 format
-        
+
         {text}
     """
     response = issue_command(prompt, temperature=0, return_json=True)

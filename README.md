@@ -35,7 +35,7 @@ Nobody should use it - so, very quickly, this is how to install it:
   SLACK_APP_SIGNING_SECRET = ...
   OPENAI_API_KEY = ...
   ```
-* Install the requirements
+* Install the requirements `poetry install`
 * Run the `bot.py` ⚡️
 
 ## One more thing

@@ -2,9 +2,10 @@ import html
 from typing import Iterable
 
 import emoji
+from slack_sdk import WebClient
 
-from emoji_map import EMOJI_MAP, UNICODE_TO_EMOJI
-from llm import get_openai_emoji
+from reactions.emoji_map import EMOJI_MAP, UNICODE_TO_EMOJI
+from reactions.prompt import get_openai_emoji
 
 
 def get_reactions(emojis):
@@ -35,3 +36,25 @@ def text_to_reactions(text):
     print(f"Looking for reactions `{text}`")
     response = get_openai_emoji(text)
     return [slack_emoji_name for slack_emoji_name in get_reactions(response["emojis"])]
+
+
+def react_to_messages(bot):
+    @bot.message()
+    def listen_and_react(body, client: WebClient):
+        # Check if the message is from a bot to avoid infinite loops
+        if "bot_id" in body["event"]:
+            return
+
+        text = body["event"]["text"].lower()
+        channel_id = body["event"]["channel"]
+        message_ts = body["event"]["ts"]
+
+        for slack_emoji_name in text_to_reactions(text):
+            try:
+                client.reactions_add(
+                    channel=channel_id,
+                    timestamp=message_ts,
+                    name=slack_emoji_name,
+                )
+            except Exception as e:
+                print(f"Error sending reaction {e}")

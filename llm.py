@@ -16,21 +16,6 @@ cache_folder = pathlib.Path(__file__).parent / ".cache"
 logger = logging.getLogger(__name__)
 
 
-def get_openai_emoji(text):
-    prompt = textwrap.dedent(
-        f"""
-            Consider the following text
-            ```{text}```
-
-        If the text is a question with multiple options return a JSON string
-            {{"multiple":true, "emojis": {{choice:"emoji"}} }}
-        Otherwise return a JSON string with
-            {{"multiple":false, "emojis": "single relevant emoji"}}
-        """
-    )
-    return issue_command(prompt, temperature=0, return_json=True)
-
-
 @cachier(cache_dir=cache_folder)
 def issue_command(text, temperature=0.3, return_json=False):
     prompt = textwrap.dedent(text).strip()

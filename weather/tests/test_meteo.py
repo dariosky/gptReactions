@@ -19,4 +19,4 @@ class TestMeteo:
         assert weather_request["endTime"] is not None
 
     def test_full(self):
-        response = text_to_weather(self.text)
+        text_to_weather(self.text)

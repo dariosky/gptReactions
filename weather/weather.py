@@ -180,7 +180,9 @@ def summarize_weather(summarized_weather_timeline):
 
         {summarized_weather_timeline}
     """
-    return issue_command(prompt)
+    weather_output = issue_command(prompt)
+    logger.info(f"Giving back: {weather_output}")
+    return weather_output
 
 
 def text_to_weather_request(text):

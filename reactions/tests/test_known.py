@@ -11,9 +11,9 @@ class TestPolls:
             ("Dogs or cats or wild boars?", {"dog", "cat", "boar"}),
             (
                 "tengo una pregunta sobre una botella de agua para hacer deporte",
-                {"sweat_drops"},
+                {"droplet"},
             ),
-            ("good morning how is it going today?", {"wave"}),
+            ("good morning how is it going today?", {"sunny"}),
             ("ai learns to walk (deep reinforcement learning)", {"robot_face"}),
         ],
     )

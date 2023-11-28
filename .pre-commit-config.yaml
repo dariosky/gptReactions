@@ -15,18 +15,16 @@ repos:
             -   id: destroyed-symlinks
             -   id: debug-statements
 
-    -   repo: https://github.com/psf/black
-        rev: 22.3.0
-        hooks:
-            -   id: black
-
     - repo: https://github.com/PyCQA/bandit
       rev: '1.7.4'
       hooks:
           - id: bandit
             args: ["-c", "bandit.yml"]
 
-    - repo: https://github.com/charliermarsh/ruff-pre-commit
-      rev: v0.0.139
+    - repo: https://github.com/astral-sh/ruff-pre-commit
+      rev: v0.1.6
       hooks:
-          - id: ruff
+        # Run the linter.
+        - id: ruff
+        # Run the formatter.
+        - id: ruff-format

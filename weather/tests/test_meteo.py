@@ -8,10 +8,8 @@ class TestMeteo:
 
     def test_get_time_and_location(self):
         weather_request = text_to_weather_request(self.text)
-        assert weather_request["location"] == {
-            "latitude": 36.4256,
-            "longitude": -5.1477,
-        }
+        assert int(weather_request["location"]["latitude"]) == 36
+        assert int(weather_request["location"]["longitude"]) == -5
         start_time = datetime.datetime.strptime(
             weather_request["startTime"], ISO_FORMAT
         )

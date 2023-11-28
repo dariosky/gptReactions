@@ -984,3 +984,6 @@ UNICODE_TO_EMOJI = {
     html.unescape(html_entity): slack_name
     for slack_name, html_entity in EMOJI_MAP.items()
 }
+
+# additional emoji conversion
+UNICODE_TO_EMOJI.update({"☀️": "sunny", "☀": "sunny"})

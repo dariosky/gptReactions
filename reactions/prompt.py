@@ -15,7 +15,7 @@ def get_openai_emoji(text):
         Otherwise return a JSON string with
             {{"multiple":false, "emojis": "single relevant emoji"}}
 
-        Example:
+        Examples:
         1. Do you want water or wine?
         {{ "multiple":true, "emojis": {{ "water": "💦", "wine": "🍷"}} }}
 
